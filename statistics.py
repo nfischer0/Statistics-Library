@@ -1,22 +1,18 @@
 import sympy
 import matplotlib.pyplot as plt
 import numpy as np
-import math
-from math import ceil
 
 def F(xaxis, f):
     '''accepts xaxis numbers and function f, returns y-vals in range of xaxis'''
     x = sympy.Symbol('x')
-    y = []
-    for num in xaxis:
-        y.append(float(f.subs(x, num)))
+    y = [float(f.subs(x, num)) for num in xaxis]
     return y
 
 def invNorm(area, mu = 0, sigma = 1):
     '''returns place on ppf of area (in other words the z-score of an area along N(mu,sigma) )'''
     x = sympy.Symbol('x')
     z = sympy.Symbol('z')
-    n = sympy.exp(-1 * (x - mu) ** 2 / (2 * sigma ** 2)) / (sigma * math.sqrt(2 * sympy.pi))
+    n = sympy.exp(-1 * (x - mu) ** 2 / (2 * sigma ** 2)) / (sigma * (2 * sympy.pi) ** .5)
     inv = sympy.solve(-1 * area + sympy.integrate(n, (x, -1 * sympy.oo, z)), z)
     return inv[0]
 
@@ -39,8 +35,8 @@ def graphNormalComparison(mu, sigma, alpha, mu0=0, sigma0=1, lowerBound=-5, uppe
     '''graphs standared N(0,1) or modified F(mu0, sigma0) in dashed red and new transformed normal curve in blue for comparison'''
     x = sympy.Symbol('x')
 
-    n = sympy.exp(-1 * (x - mu0)**2 / (2*sigma0**2)) / (sigma0 * math.sqrt(2 * sympy.pi)) #standard normal curve
-    f = sympy.exp(-1 * (x - mu)**2 / (2*sigma**2)) / (sigma * math.sqrt(2 * sympy.pi)) #custom normal curve
+    n = sympy.exp(-1 * (x - mu0)**2 / (2*sigma0**2)) / (sigma0 * (2 * sympy.pi) ** .5) #standard normal curve
+    f = sympy.exp(-1 * (x - mu)**2 / (2*sigma**2)) / (sigma * (2 * sympy.pi) ** .5) #custom normal curve
     xaxis = np.linspace(lowerBound,upperBound,10000)
     plt.plot(xaxis, F(xaxis, f), color='r') #Ha
     plt.plot(xaxis, F(xaxis, n), color='b') #Ho
@@ -70,7 +66,7 @@ def graphNormalComparison(mu, sigma, alpha, mu0=0, sigma0=1, lowerBound=-5, uppe
 def graphNorm_CDF(z1, z2, mu = 0, sigma = 1, lowerBound=-3, upperBound=3):
     '''graphs N(mu, sigma) and shades and integrates the area between z scores'''
     x = sympy.Symbol('x')
-    f = sympy.exp(-1 * (x - mu) ** 2 / (2 * sigma ** 2)) / (sigma * math.sqrt(2 * sympy.pi))
+    f = sympy.exp(-1 * (x - mu) ** 2 / (2 * sigma ** 2)) / (sigma * (2 * sympy.pi) ** .5)
     xaxis = np.linspace(lowerBound, upperBound, 1000)
     plt.plot(xaxis, F(xaxis, f))
     if lowerBound < z1 < upperBound:
@@ -94,7 +90,7 @@ def graphNorm_CDF(z1, z2, mu = 0, sigma = 1, lowerBound=-3, upperBound=3):
 def norm_CDF(z1, z2, mu = 0, sigma = 1):
     '''integrates N(mu, sigma) between z1 and z2'''
     x = sympy.Symbol('x')
-    f = sympy.exp(-1 * (x - mu) ** 2 / (2 * sigma ** 2)) / (sigma * math.sqrt(2 * sympy.pi))
+    f = sympy.exp(-1 * (x - mu) ** 2 / (2 * sigma ** 2)) / (sigma * (2 * sympy.pi) ** .5)
     integral = float(sympy.integrate(f, (x, z1, z2)))
     return integral
 
@@ -147,7 +143,7 @@ def compare_T(df, num, lowerBound=-5, upperBound=5):
     step = float( df / num )
     x = sympy.Symbol('x')
     d = sympy.Symbol('d')
-    up = ceil(num / 2)
+    up = numpy.ceil(num / 2)
     down = num - up
     f = (sympy.factorial(((d + 1) / 2) - 1) * (1 + (x ** 2 / d)) ** (-1 * ((d + 1) / 2))) / (sympy.factorial((d / 2) - 1) * ((d * sympy.pi) ** .5))
     xaxis = np.linspace(lowerBound, upperBound, 1000)
@@ -198,7 +194,7 @@ def compareChiSquared(df, num, lowerBound=0, upperBound=20):
     step = float(df / num)
     x = sympy.Symbol('x')
     d = sympy.Symbol('d')
-    up = ceil(num / 2)
+    up = numpy.ceil(num / 2)
     down = num - up
     f = ((x ** ((d / 2) - 1)) * sympy.exp(-1 * x / 2)) / (2 ** (d / 2) * sympy.factorial((d / 2) - 1))
     xaxis = np.linspace(lowerBound, upperBound, 1000)
